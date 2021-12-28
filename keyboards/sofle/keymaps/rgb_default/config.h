@@ -41,46 +41,19 @@
 
 
 #define RGBLIGHT_SLEEP
-//
 #define RGBLIGHT_LAYERS
 
 /* ws2812 RGB LED */
 #define RGB_DI_PIN D3
 
-
 #ifdef RGB_MATRIX_ENABLE
-#define RGBLED_NUM 35    // Number of LEDs
-#define RGBLED_NUM 35    // Number of LEDs
-#define DRIVER_LED_TOTAL RGBLED_NUM
-#endif
 
-#ifdef RGBLIGHT_ENABLE
-    #undef RGBLED_NUM
+#   define RGBLED_NUM 72
+#   define DRIVER_LED_TOTAL RGBLED_NUM
+#   define RGB_MATRIX_SPLIT {36,36}
+#   define SPLIT_TRANSPORT_MIRROR
 
-    //#define RGBLIGHT_ANIMATIONS
-	//#define RGBLIGHT_EFFECT_BREATHING
-	#define RGBLIGHT_EFFECT_RAINBOW_MOOD
-	//#define RGBLIGHT_EFFECT_RAINBOW_SWIRL
-	//#define RGBLIGHT_EFFECT_SNAKE
-	//#define RGBLIGHT_EFFECT_KNIGHT
-	//#define RGBLIGHT_EFFECT_CHRISTMAS
-	//#define RGBLIGHT_EFFECT_STATIC_GRADIENT
-	//#define RGBLIGHT_EFFECT_RGB_TEST
-	//#define RGBLIGHT_EFFECT_ALTERNATING
-	//#define RGBLIGHT_EFFECT_TWINKLE
 
-    #define RGBLED_NUM 70
-	//#define RGBLED_SPLIT
-	#define RGBLED_SPLIT { 35, 35 } // haven't figured out how to use this yet
-
-	//#define RGBLED_NUM 30
-    #define RGBLIGHT_LIMIT_VAL 120
-    #define RGBLIGHT_HUE_STEP 10
-    #define RGBLIGHT_SAT_STEP 17
-    #define RGBLIGHT_VAL_STEP 17
-#endif
-
-#ifdef RGB_MATRIX_ENABLE
 #   define RGB_MATRIX_KEYPRESSES // reacts to keypresses
 // #   define RGB_MATRIX_KEYRELEASES // reacts to keyreleases (instead of keypresses)
 // #   define RGB_DISABLE_AFTER_TIMEOUT 0 // number of ticks to wait until disabling effects
@@ -90,7 +63,7 @@
 // #   define RGB_MATRIX_LED_FLUSH_LIMIT 16 // limits in milliseconds how frequently an animation will update the LEDs. 16 (16ms) is equivalent to limiting to 60fps (increases keyboard responsiveness)
 #    define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150 // limits maximum brightness of LEDs to 150 out of 255. Higher may cause the controller to crash.
 
-#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_GRADIENT_LEFT_RIGHT
+#   define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_GRADIENT_LEFT_RIGHT
 
 #    define RGB_MATRIX_HUE_STEP 8
 #    define RGB_MATRIX_SAT_STEP 8
@@ -127,4 +100,36 @@
  // #   undef ENABLE_RGB_MATRIX_MULTISPLASH
  // #   undef ENABLE_RGB_MATRIX_SOLID_SPLASH
  // #   undef ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
+
 #endif
+
+#ifdef RGBLIGHT_ENABLE
+    #undef RGBLED_NUM
+
+    //#define RGBLIGHT_ANIMATIONS   // Enable all additional animation modes.
+	//#define RGBLIGHT_EFFECT_BREATHING
+	#define RGBLIGHT_EFFECT_RAINBOW_MOOD
+	//#define RGBLIGHT_EFFECT_RAINBOW_SWIRL
+    //#define RGBLIGHT_EFFECT_SNAKE
+    //#define RGBLIGHT_EFFECT_KNIGHT
+	//#define RGBLIGHT_EFFECT_CHRISTMAS
+	//#define RGBLIGHT_EFFECT_STATIC_GRADIENT
+	//#define RGBLIGHT_EFFECT_RGB_TEST
+	//#define RGBLIGHT_EFFECT_ALTERNATING
+	//#define RGBLIGHT_EFFECT_TWINKLE
+
+    #define RGBLED_NUM (72 + 1)
+	//#define RGBLED_SPLIT
+	#define RGBLED_SPLIT { 37, 37 } // haven't figured out how to use this yet
+
+	//#define RGBLED_NUM 30
+    #define RGBLIGHT_LIMIT_VAL 120
+    #define RGBLIGHT_HUE_STEP 10
+    #define RGBLIGHT_SAT_STEP 17
+    #define RGBLIGHT_VAL_STEP 17
+#endif
+
+#define MEDIA_KEY_DELAY 2
+
+#define USB_POLLING_INTERVAL_MS 1
+#define QMK_KEYS_PER_SCAN 12
