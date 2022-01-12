@@ -39,6 +39,10 @@
 #endif
 #define ENCODER_DIRECTION_FLIP
 
+#ifdef ENCODER_RESOLUTION
+    #undef ENCODER_RESOLUTION
+#endif
+#define ENCODER_RESOLUTION 4
 
 /* ws2812 RGB LED */
 #define RGB_DI_PIN D3
@@ -105,7 +109,7 @@
     #define RGBLIGHT_SLEEP
     #define RGBLIGHT_LAYERS
     //#define RGBLIGHT_ANIMATIONS   // Enable all additional animation modes.
-	#define RGBLIGHT_EFFECT_BREATHING
+	//#define RGBLIGHT_EFFECT_BREATHING
 	#define RGBLIGHT_EFFECT_RAINBOW_MOOD
 	#define RGBLIGHT_EFFECT_RAINBOW_SWIRL
     //#define RGBLIGHT_EFFECT_SNAKE
