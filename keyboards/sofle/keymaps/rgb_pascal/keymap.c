@@ -100,6 +100,8 @@ enum custom_keycodes {
     KC_D_MUTE
 };
 
+static bool is_intl_layer = false;
+
 #define KC_REDO LCTL(LSFT(KC_Z))
 #define KC_SAVE LCTL(KC_S)
 #define KC_CLOSE LCTL(KC_Q)
@@ -362,23 +364,26 @@ const rgblight_segment_t PROGMEM layer_switcher_lights[] = RGBLIGHT_LAYER_SEGMEN
 const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
 
     layer_qwerty_lights,
-	layer_num_lights,// overrides layer 1
+	layer_dvorak_lights,
+	layer_num_lights,        // overrides layer 1
 	layer_symbol_lights,
     layer_command_lights,
 	layer_numpad_lights,
-	layer_switcher_lights,  // Overrides other layers
-	layer_dvorak_lights
+	layer_switcher_lights
 );
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-	rgblight_set_layer_state(0, layer_state_cmp(state, _DEFAULTS) && layer_state_cmp(default_layer_state,_QWERTY));
-	rgblight_set_layer_state(6, layer_state_cmp(state, _DEFAULTS) && layer_state_cmp(default_layer_state,_DVORAK));
 
-	rgblight_set_layer_state(1, layer_state_cmp(state, _LOWER));
-	rgblight_set_layer_state(2, layer_state_cmp(state, _RAISE));
-	rgblight_set_layer_state(3, layer_state_cmp(state, _ADJUST));
-	rgblight_set_layer_state(4, layer_state_cmp(state, _NUMPAD));
-	rgblight_set_layer_state(5, layer_state_cmp(state, _SWITCH));
+    unsigned l = 0;    
+            
+	rgblight_set_layer_state(l++, layer_state_cmp(state, _DEFAULTS) && layer_state_cmp(default_layer_state,_QWERTY));
+	rgblight_set_layer_state(l++, layer_state_cmp(state, _DEFAULTS) && layer_state_cmp(default_layer_state,_DVORAK));
+
+	rgblight_set_layer_state(l++, layer_state_cmp(state, _LOWER));
+	rgblight_set_layer_state(l++, layer_state_cmp(state, _RAISE));
+	rgblight_set_layer_state(l++, layer_state_cmp(state, _ADJUST));
+	rgblight_set_layer_state(l++, layer_state_cmp(state, _NUMPAD));
+	rgblight_set_layer_state(l++, layer_state_cmp(state, _SWITCH));
     return state;
 }
 void keyboard_post_init_user(void) {
@@ -446,6 +451,12 @@ static void print_status_narrow(void) {
             oled_write_ln_P(PSTR("Undef"), false);
     }
     
+    if(is_intl_layer) {
+        oled_write_ln_P(PSTR("Intl"), false);
+    } else {
+        oled_write_ln_P(PSTR(" "), false);
+    }
+    
 }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
@@ -503,6 +514,32 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_ADJUST);
             }
             return false;
+        case KC_INTL:
+            is_intl_layer = record->event.pressed;
+            return false;
+
+        default:
+            if(is_intl_layer && record->event.pressed) {    // Would be nicer with lambda that determines press/unpress
+                switch (keycode) {
+                    case KC_A:
+                        tap_code16(RALT(KC_Q)); // for ä at position a
+                        return false;
+                    case KC_S:
+                        tap_code16(RALT(KC_S)); // for ß at position s
+                        return false;
+                    case KC_U:
+                        tap_code16(RALT(KC_Y)); // for ü at position u
+                        return false;
+                    case KC_O:
+                        tap_code16(RALT(KC_P)); // for ö at position o
+                        return false;
+                    case KC_E:
+                        tap_code16(RALT(KC_5)); // for € at position e
+                        return false;
+                    default:
+                        return true; // Don't modify
+                }
+            }
     }
     return true;
 }
