@@ -106,7 +106,7 @@ static bool is_intl_layer = false;
 #define KC_SAVE LCTL(KC_S)
 #define KC_CLOSE LCTL(KC_Q)
 // Gnome: Print screen part
-#define KC_SCRN LCTL(LSFT(KC_PSCR))
+#define KC_SCRN LSFT(KC_PSCR)
 #define KC_WNSFT LSFT(KC_LGUI)
 #undef KC_UNDO
 #define KC_UNDO LCTL(KC_Z)
