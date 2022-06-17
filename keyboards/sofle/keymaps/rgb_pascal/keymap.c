@@ -48,6 +48,10 @@
 	  {LEFTRIGHT_SPLIT+START_BACKLIGHT+9, 5, hsv},\
 	  {LEFTRIGHT_SPLIT+START_BACKLIGHT+16, 3, hsv},\
 	  {LEFTRIGHT_SPLIT+START_BACKLIGHT+21, 3, hsv}
+
+#define SET_NUMSW(hsv)		\
+      {LEFTRIGHT_SPLIT+START_BACKLIGHT, 1, hsv}
+
 #define SET_NUMROW(hsv) \
 	    {10, 2, hsv}, \
 		{20, 2, hsv}, \
@@ -77,6 +81,13 @@
 		{START_THUMB, 2, hsv}, \
 	  {LEFTRIGHT_SPLIT+ START_THUMB, 2, hsv}
 
+#define QUERTY_COLOR HSV_SPRINGGREEN
+#define DVORAK_COLOR HSV_RORANGE
+#define LOWER_COLOR HSV_TEAL
+#define RAISE_COLOR HSV_YELLOW
+#define ADJUST_COLOR HSV_PURPLE
+#define NUMPAD_COLOR HSV_ORANGE
+#define NUMPAD_DETAIL_COLOR HSV_BLUE
 
 enum sofle_layers {
     _DEFAULTS = 0,
@@ -215,8 +226,8 @@ LT(_NUMPAD,KC_ESC),KC_1,KC_2,KC_3,    KC_4,    KC_5,             LT(_SWITCH,KC_6
  * |------+------+------+------+------+------| | ____ |  | UPDN | |------+------+------+------+------+------|
  * | ____ | Undo |  Cut | Copy | Paste|      | '------'  '------' |   _  |   =  |   [  |   ]  |   ~  | ____ | 
  * `-----------------------------------------'  ________  _______ '-----------------------------------------'
- *               | LGui | LAlt | INTL |/LOWER| /       /  \      \RAISE \| RCTR |LOWER |  \|  |
- *               |      |      |      |      |/ Enter /    \Space \      \      |      |      |
+ *               | LGui | LAlt | INTL |/LOWER| /       /  \      \RAISE \| RCTR |LOWER | TOGG |
+ *               |      |      |      |      |/ Enter /    \Space \      \      |      | NUMP |
  *               `-----------------------------------'     '------''------------'------'------'
  */
 [_RAISE] = LAYOUT(
@@ -229,7 +240,7 @@ LT(_NUMPAD,KC_ESC),KC_1,KC_2,KC_3,    KC_4,    KC_5,             LT(_SWITCH,KC_6
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
   _______, KC_UNDO,  KC_CUT,  KC_COPY,KC_PASTE, XXXXXXX,_______,  _______,KC_UNDS, KC_EQL, KC_LBRC, KC_RBRC, KC_TILD, _______, 
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
-                 _______, _______, _______, _______, _______,     _______, _______, _______, _______, _______
+                 _______, _______, _______, _______, _______,     _______, _______, _______, _______, TG(_NUMPAD)
   //            \--------+--------+--------+---------+-------|   |--------+---------+--------+---------+-------/
 ),
 /* ADJUST
@@ -269,8 +280,8 @@ LT(_NUMPAD,KC_ESC),KC_1,KC_2,KC_3,    KC_4,    KC_5,             LT(_SWITCH,KC_6
  * |------+------+------+------+------+------| | ____ |  | ____ | |------+------+------+------+------+------|
  * | ____ |      |      |      |      |      | '------'  '------' |   +  |   1  |   2  |   3  |   =  | ENTER|
  * `-----------------------------------------'  ________  _______ '-----------------------------------------'
- *               |LCtrl | ???? | LAlt |/LOWER| /       /  \      \ RAISE\|   0  |   .  |      |
- *               |      |      |      |      |/ Enter /    \Space \      \      |      |      |
+ *               |LCtrl | ???? | LAlt |/LOWER| /       /  \      \ RAISE\|   0  |   .  | TOGG |
+ *               |      |      |      |      |/ Enter /    \Space \      \      |      | NUMP |
  *               `-----------------------------------'     '------''------------'------'------'
  */
 [_NUMPAD] = LAYOUT(
@@ -283,7 +294,7 @@ LT(_NUMPAD,KC_ESC),KC_1,KC_2,KC_3,    KC_4,    KC_5,             LT(_SWITCH,KC_6
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
   _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,_______,   _______,KC_PLUS, KC_P1,  KC_P2,   KC_P3,   KC_EQL,  KC_ENT,
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
-              _______, OSM(MOD_MEH), _______, _______, _______,   _______, _______,  KC_P0,   KC_PDOT, XXXXXXX
+              _______, OSM(MOD_MEH), _______, _______, _______,   _______, _______,  KC_P0,   KC_PDOT, TG(_NUMPAD)
   //            \--------+--------+--------+---------+-------|   |--------+---------+--------+---------+-------/
 ),
 
@@ -328,33 +339,36 @@ char layer_state_str[70];
 // QWERTY,
 // Light on inner column and underglow
 const rgblight_segment_t PROGMEM layer_qwerty_lights[] = RGBLIGHT_LAYER_SEGMENTS(
-  SET_LAYER_ID(HSV_SPRINGGREEN)
+  SET_LAYER_ID(QUERTY_COLOR)
 
 );
 const rgblight_segment_t PROGMEM layer_dvorak_lights[] = RGBLIGHT_LAYER_SEGMENTS(
-  SET_LAYER_ID(HSV_RORANGE)
+  SET_LAYER_ID(DVORAK_COLOR)
 );
 
 // _NUM (LOWER)
 const rgblight_segment_t PROGMEM layer_num_lights[] = RGBLIGHT_LAYER_SEGMENTS(
-	SET_LAYER_ID(HSV_TEAL),   // Arrow keys
+	SET_LAYER_ID(LOWER_COLOR),
+	   // Arrow keys
 	  {LEFTRIGHT_SPLIT+START_BACKLIGHT+12, 1, HSV_RED},\
 	  {LEFTRIGHT_SPLIT+START_BACKLIGHT+16, 2, HSV_RED},\
 	  {LEFTRIGHT_SPLIT+START_BACKLIGHT+22, 1, HSV_RED}
 );
 // _SYMBOL (RAISE)
 const rgblight_segment_t PROGMEM layer_symbol_lights[] = RGBLIGHT_LAYER_SEGMENTS(
-	SET_LAYER_ID(HSV_YELLOW)
+	SET_LAYER_ID(RAISE_COLOR),
+	SET_NUMSW(NUMPAD_DETAIL_COLOR)
     );
 // _COMMAND, (Adj)
 const rgblight_segment_t PROGMEM layer_command_lights[] = RGBLIGHT_LAYER_SEGMENTS(
-  SET_LAYER_ID(HSV_PURPLE)
+  SET_LAYER_ID(ADJUST_COLOR)
 );
 
 //_NUMPAD
 const rgblight_segment_t PROGMEM layer_numpad_lights[] = RGBLIGHT_LAYER_SEGMENTS(
-	SET_LAYER_ID(HSV_ORANGE),
-	SET_NUMPAD(HSV_BLUE)
+	SET_LAYER_ID(NUMPAD_COLOR),
+	SET_NUMPAD(NUMPAD_DETAIL_COLOR),
+	SET_NUMSW(RAISE_COLOR)
     );
 // _SWITCHER   // light up top row
 const rgblight_segment_t PROGMEM layer_switcher_lights[] = RGBLIGHT_LAYER_SEGMENTS(
