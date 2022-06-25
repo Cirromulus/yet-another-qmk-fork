@@ -112,7 +112,7 @@
 	//#define RGBLIGHT_EFFECT_BREATHING
 	#define RGBLIGHT_EFFECT_RAINBOW_MOOD
 	#define RGBLIGHT_EFFECT_RAINBOW_SWIRL
-    //#define RGBLIGHT_EFFECT_SNAKE
+    #define RGBLIGHT_EFFECT_SNAKE		// Boring but practical to find out order of lights
     //#define RGBLIGHT_EFFECT_KNIGHT
 	//#define RGBLIGHT_EFFECT_CHRISTMAS
 	//#define RGBLIGHT_EFFECT_STATIC_GRADIENT
@@ -121,11 +121,9 @@
 	//#define RGBLIGHT_EFFECT_TWINKLE
 
     #define RGBLED_NUM (72 + 1)
-	//#define RGBLED_SPLIT
 	#define RGBLED_SPLIT { 37, 37 } // haven't figured out how to use this yet
 
-	//#define RGBLED_NUM 30
-    #define RGBLIGHT_LIMIT_VAL 120
+    #define RGBLIGHT_LIMIT_VAL 200
     #define RGBLIGHT_HUE_STEP 10
     #define RGBLIGHT_SAT_STEP 17
     #define RGBLIGHT_VAL_STEP 17
