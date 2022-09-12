@@ -116,8 +116,6 @@ static bool is_intl_layer = false;
 #define KC_REDO LCTL(LSFT(KC_Z))
 #define KC_SAVE LCTL(KC_S)
 #define KC_CLOSE LCTL(KC_Q)
-// Gnome: Print screen part
-#define KC_SCRN LSFT(KC_PSCR)
 #define KC_WNSFT LSFT(KC_LGUI)
 #undef KC_UNDO
 #define KC_UNDO LCTL(KC_Z)
@@ -207,7 +205,7 @@ LT(_NUMPAD,KC_ESC),KC_1,KC_2,KC_3,    KC_4,    KC_5,             LT(_SWITCH,KC_6
   //,------------------------------------------------.                    ,---------------------------------------------------.
   _______,  KC_F1,  KC_F2,   KC_F3,   KC_F4,   KC_F5,                      KC_F6,  KC_F7,   KC_F8,   KC_F9,   KC_F10, _______,
   //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
-  _______,  KC_SCRN,KC_WNSFT,KC_CLOSE,KC_SAVE, KC_NO,                      KC_NO,  KC_NO,   KC_UP,   KC_NO,   KC_F11, _______,
+  _______,  KC_PSCR,KC_WNSFT,KC_CLOSE,KC_SAVE, KC_NO,                      KC_NO,  KC_NO,   KC_UP,   KC_NO,   KC_F11, _______,
   //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
   _______,  KC_CUT, KC_COPY, KC_PASTE,KC_WH_U, KC_PGUP,                    KC_NO,  KC_LEFT, KC_DOWN, KC_RGHT, KC_F12, KC_NO,
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
