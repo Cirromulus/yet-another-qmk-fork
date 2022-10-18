@@ -23,9 +23,7 @@
 ///https://thomasbaart.nl/2018/12/01/reducing-firmware-size-in-qmk/
 
 
-#define MASTER_LEFT
-// #define MASTER_RIGHT
-// #define EE_HANDS
+#define EE_HANDS
 
 #define CUSTOM_FONT
 
@@ -112,7 +110,7 @@
 	//#define RGBLIGHT_EFFECT_BREATHING
 	#define RGBLIGHT_EFFECT_RAINBOW_MOOD
 	#define RGBLIGHT_EFFECT_RAINBOW_SWIRL
-    #define RGBLIGHT_EFFECT_SNAKE		// Boring but practical to find out order of lights
+    //#define RGBLIGHT_EFFECT_SNAKE		// Boring but practical to find out order of lights
     //#define RGBLIGHT_EFFECT_KNIGHT
 	//#define RGBLIGHT_EFFECT_CHRISTMAS
 	//#define RGBLIGHT_EFFECT_STATIC_GRADIENT
@@ -133,3 +131,9 @@
 
 #define USB_POLLING_INTERVAL_MS 1
 #define QMK_KEYS_PER_SCAN 12
+
+
+#define POINTING_DEVICE_ROTATION_90
+#define SPLIT_POINTING_ENABLE
+#define POINTING_DEVICE_RIGHT
+#define POINTING_DEVICE_TASK_THROTTLE_MS 8

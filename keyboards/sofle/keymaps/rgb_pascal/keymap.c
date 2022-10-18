@@ -17,6 +17,9 @@
   // SOFLE RGB
 #include <stdio.h>
 
+#include <string.h>     //memcpy
+#include "lib/lib8tion/lib8tion.h"  // mouse smoothing
+
 #include QMK_KEYBOARD_H
 #include <rgblight.h>
 
@@ -410,16 +413,6 @@ void keyboard_post_init_user(void) {
 
 #ifdef OLED_ENABLE
 
-static void render_logo(void) {
-    static const char PROGMEM qmk_logo[] = {
-        0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x8A, 0x8B, 0x8C, 0x8D, 0x8E, 0x8F, 0x90, 0x91, 0x92, 0x93, 0x94,
-        0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF, 0xB0, 0xB1, 0xB2, 0xB3, 0xB4,
-        0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF, 0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0x00
-    };
-
-    oled_write_P(qmk_logo, false);
-}
-
 static void print_status_narrow(void) {
     // Print current mode
     oled_write_P(PSTR("\n\n"), false);
@@ -483,7 +476,7 @@ bool oled_task_user(void) {
     if (is_keyboard_master()) {
         print_status_narrow();
     } else {
-        render_logo();
+        //render_logo();    // De-soldered right OLED
     }
     return false;
 }
@@ -566,34 +559,75 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
         } else {
             tap_code(KC_VOLD);
         }
-		} else if (index == 1) {
-			switch (get_highest_layer(layer_state)) {
-				case _QWERTY:
-				case _DVORAK:
-					if (clockwise) {
-						tap_code(KC_MNXT);
-					} else {
-						tap_code(KC_MPRV);
-					}
-				break;
-			case _RAISE:
-			case _LOWER:
-					if (clockwise) {
-						tap_code(KC_DOWN);
-					} else {
-						tap_code(KC_UP);
-					}
-				break;
-			default:
-					if (clockwise) {
-						tap_code(KC_WH_D);
-					} else {
-						tap_code(KC_WH_U);
-					}
-				break;
-		}
+	} else if (index == 1) {
+    	// DEAD code as we don't have a right side encoder anymore
+		switch (get_highest_layer(layer_state)) {
+			case _QWERTY:
+			case _DVORAK:
+				if (clockwise) {
+					tap_code(KC_MNXT);
+				} else {
+					tap_code(KC_MPRV);
+				}
+			break;
+		case _RAISE:
+		case _LOWER:
+				if (clockwise) {
+					tap_code(KC_DOWN);
+				} else {
+					tap_code(KC_UP);
+				}
+			break;
+		default:
+				if (clockwise) {
+					tap_code(KC_WH_D);
+				} else {
+					tap_code(KC_WH_U);
+				}
+			break;
+	    }
     }
     return true;
 }
 
 #endif
+
+
+static uint32_t       last_mouse_activity = 0;
+static report_mouse_t last_mouse_report   = {0};
+static bool           is_scrolling        = false;
+
+report_mouse_t smooth_mouse_movement(report_mouse_t mouse_report) {
+    // Linear interpolation and ease-in-out
+    static fract8 fract = 0.5;
+    int8_t        x     = 0;
+    int8_t        y     = 0;
+    int8_t        h     = 0;
+    int8_t        v     = 0;
+
+    if (!is_scrolling) {
+        x = ease8InOutApprox(lerp8by8(last_mouse_report.x, mouse_report.x, fract));
+        y = ease8InOutApprox(lerp8by8(last_mouse_report.y, mouse_report.y, fract));
+    } else {
+        h = ease8InOutApprox(lerp8by8(last_mouse_report.x, mouse_report.x, fract));
+        v = ease8InOutApprox(lerp8by8(last_mouse_report.y, mouse_report.y, fract));
+    }
+
+    // update the new smoothed report
+    mouse_report.x = x;
+    mouse_report.y = y;
+    mouse_report.h = h;
+    mouse_report.v = v;
+
+    return mouse_report;
+}
+
+report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+
+    if (has_mouse_report_changed(&last_mouse_report, &mouse_report)) {
+        last_mouse_activity = timer_read32();
+        memcpy(&last_mouse_report, &mouse_report, sizeof(mouse_report));
+    }
+
+    return smooth_mouse_movement(mouse_report);
+}
