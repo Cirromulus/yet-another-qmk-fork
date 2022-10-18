@@ -513,6 +513,29 @@ void smooth_mouse_movement(report_mouse_t* mouse_report) {
 
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 
+    bool is_scrolling_layer = false;
+    switch (get_highest_layer(layer_state)) {
+        case _LOWER:
+            is_scrolling_layer = true;
+            break;
+        default:
+            break;
+    }
+    
+    if(mouse_is_scrolling != is_scrolling_layer) {
+        if(mouse_is_scrolling) {
+            pimoroni_trackball_set_rgbw(TRACKBALL_SCROLLING_COLOR);
+            pimoroni_trackball_set_cpi(SCROLLING_CPI);
+        } else {
+            if(is_intl_layer) {
+                pimoroni_trackball_set_rgbw(TRACKBALL_RIGHTCLICK_COLOR);
+            } else {
+                pimoroni_trackball_set_rgbw(TRACKBALL_DEFAULT_COLOR);
+            }    
+            pimoroni_trackball_set_cpi(DEFAULT_CPI);
+        }
+    }
+
     if (mouse_is_scrolling) {
         mouse_report.h = mouse_report.x;
         mouse_report.v = mouse_report.y;
@@ -599,29 +622,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 }
             }
     }
-    
-    bool is_scrolling_layer = false;
-    switch (get_highest_layer(layer_state)) {
-        case _LOWER:
-            is_scrolling_layer = true;
-            break;
-        default:
-            break;
-    }
-    
-    if(mouse_is_scrolling != is_scrolling_layer) {
-        if(mouse_is_scrolling) {
-            pimoroni_trackball_set_rgbw(TRACKBALL_SCROLLING_COLOR);
-            pimoroni_trackball_set_cpi(SCROLLING_CPI);
-        } else {
-            if(is_intl_layer) {
-                pimoroni_trackball_set_rgbw(TRACKBALL_RIGHTCLICK_COLOR);
-            } else {
-                pimoroni_trackball_set_rgbw(TRACKBALL_DEFAULT_COLOR);
-            }    
-            pimoroni_trackball_set_cpi(DEFAULT_CPI);
-        }
-    }    
     
     return process_keycode;
 }
