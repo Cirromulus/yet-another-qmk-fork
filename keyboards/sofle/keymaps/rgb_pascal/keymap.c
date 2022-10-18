@@ -523,6 +523,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     }
     
     if(mouse_is_scrolling != is_scrolling_layer) {
+        mouse_is_scrolling = is_scrolling_layer;
         if(mouse_is_scrolling) {
             pimoroni_trackball_set_rgbw(TRACKBALL_SCROLLING_COLOR);
             pimoroni_trackball_set_cpi(SCROLLING_CPI);
@@ -555,18 +556,17 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 //
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    bool process_keycode = false;
     switch (keycode) {
         case KC_QWERTY:
             if (record->event.pressed) {
                 set_single_persistent_default_layer(_QWERTY);
             }
-            break;
+            return false;
         case KC_DVORAK:
             if (record->event.pressed) {
                 set_single_persistent_default_layer(_DVORAK);
             }
-            break;
+            return false;
         case KC_LOWER:
             if (record->event.pressed) {
                 layer_on(_LOWER);
@@ -575,7 +575,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_LOWER);
                 update_tri_layer(_LOWER, _RAISE, _ADJUST);
             }
-            break;
+            return false;
         case KC_RAISE:
             if (record->event.pressed) {
                 layer_on(_RAISE);
@@ -584,46 +584,43 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_RAISE);
                 update_tri_layer(_LOWER, _RAISE, _ADJUST);
             }
-            break;
+            return false;
         case KC_ADJUST:
             if (record->event.pressed) {
                 layer_on(_ADJUST);
             } else {
                 layer_off(_ADJUST);
             }
-            break;
+            return false;
         case KC_INTL:
             is_intl_layer = record->event.pressed;
-            break;
+            return false;
 
         default:
-            process_keycode = true;
             if(is_intl_layer && record->event.pressed) {    // Would be nicer with lambda that determines press/unpress
-                process_keycode = false;
                 switch (keycode) {
                     case KC_A:
                         tap_code16(RALT(KC_Q)); // for ä at position a
-                        break;
+                        return false;
                     case KC_S:
                         tap_code16(RALT(KC_S)); // for ß at position s
-                        break;
+                        return false;
                     case KC_U:
                         tap_code16(RALT(KC_Y)); // for ü at position u
-                        break;
+                        return false;
                     case KC_O:
                         tap_code16(RALT(KC_P)); // for ö at position o
-                        break;
+                        return false;
                     case KC_E:
                         tap_code16(RALT(KC_5)); // for € at position e
-                        break;
+                        return false;
                     default:
-                        process_keycode = true;
                         break; // Don't modify
                 }
             }
     }
     
-    return process_keycode;
+    return true;
 }
 
 #ifdef ENCODER_ENABLE
