@@ -511,6 +511,21 @@ void smooth_mouse_movement(report_mouse_t* mouse_report) {
 }
 **/
 
+
+#    if defined(POINTING_DEVICE_LEFT)
+#        define POINTING_DEVICE_THIS_SIDE is_keyboard_left()
+#    elif defined(POINTING_DEVICE_RIGHT)
+#        define POINTING_DEVICE_THIS_SIDE !is_keyboard_left()
+#    elif defined(POINTING_DEVICE_COMBINED)
+#        define POINTING_DEVICE_THIS_SIDE true
+#    endif
+
+void trackball_set_rgbw(uint8_t r, uint8_t g, uint8_t b, uint8_t w){
+    if(POINTING_DEVICE_THIS_SIDE)
+        pimoroni_trackball_set_rgbw(r, g, b ,w);
+    // others currently not supported or i am too dumb to understand
+}
+
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 
     bool is_scrolling_layer = false;
@@ -525,15 +540,15 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     if(mouse_is_scrolling != is_scrolling_layer) {
         mouse_is_scrolling = is_scrolling_layer;
         if(mouse_is_scrolling) {
-            pimoroni_trackball_set_rgbw(TRACKBALL_SCROLLING_COLOR);
-            pimoroni_trackball_set_cpi(SCROLLING_CPI);
+            trackball_set_rgbw(TRACKBALL_SCROLLING_COLOR);
+            pointing_device_set_cpi(SCROLLING_CPI);
         } else {
             if(is_intl_layer) {
-                pimoroni_trackball_set_rgbw(TRACKBALL_RIGHTCLICK_COLOR);
+                trackball_set_rgbw(TRACKBALL_RIGHTCLICK_COLOR);
             } else {
-                pimoroni_trackball_set_rgbw(TRACKBALL_DEFAULT_COLOR);
+                trackball_set_rgbw(TRACKBALL_DEFAULT_COLOR);
             }    
-            pimoroni_trackball_set_cpi(DEFAULT_CPI);
+            pointing_device_set_cpi(DEFAULT_CPI);
         }
     }
 
