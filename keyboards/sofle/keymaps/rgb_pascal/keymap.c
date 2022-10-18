@@ -91,6 +91,9 @@
 #define ADJUST_COLOR HSV_PURPLE
 #define NUMPAD_COLOR HSV_ORANGE
 #define NUMPAD_DETAIL_COLOR HSV_BLUE
+#define TRACKBALL_DEFAULT_COLOR RGB_ORANGE,0x20
+#define TRACKBALL_SCROLLING_COLOR RGB_GREEN,0x50
+#define TRACKBALL_RIGHTCLICK_COLOR RGB_BLUE,0xA0
 
 enum sofle_layers {
     _DEFAULTS = 0,
@@ -115,6 +118,9 @@ enum custom_keycodes {
 };
 
 static bool is_intl_layer = false;
+static bool mouse_is_scrolling  = false;
+#define DEFAULT_CPI 13000
+#define SCROLLING_CPI 1500
 
 #define KC_REDO LCTL(LSFT(KC_Z))
 #define KC_SAVE LCTL(KC_S)
@@ -138,7 +144,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * | TAB  |   Q  |   W  |   E  |   R  |   T  |                    |   Y  |   U  |   I  |   O  |   P  | Bspc |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |LShift|   A  |   S  |   D  |   F  |   G  | .------.  ,------. |   H  |   J  |   K  |   L  |   ;  | Del  |
- * |------+------+------+------+------+------| | MUTE |  |PLAYPS| |------+------+------+------+------+------|
+ * |------+------+------+------+------+------| | MUTE |  |MOUSE | |------+------+------+------+------+------|
  * |LCtrl |   Z  |   X  |   C  |   V  |   B  | '------'  '------' |   N  |   M  |   ,  |   .  |   /  | Enter|
  * `-----------------------------------------'  ________  _______ '-----------------------------------------'
  *               | LGui | LAlt | INTL |/LOWER| /       /  \      \RAISE \| RCTR |LOWER | RGUI |
@@ -169,7 +175,7 @@ LT(_NUMPAD,KC_ESC),KC_1,KC_2,KC_3,    KC_4,    KC_5,             LT(_SWITCH,KC_6
  * | TAB  |  '"  |  ,<  |  .>  |   P  |   Y  |                    |   F  |   G  |   C  |   R  |   L  | Bspc |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |LShift|   A  |   O  |   E  |   U  |   I  | .------.  ,------. |   D  |   H  |   T  |   N  |   S  |  /?  |
- * |------+------+------+------+------+------| | MUTE |  |PLAYPS| |------+------+------+------+------+------|
+ * |------+------+------+------+------+------| |PLAYPS|  |MOUSE | |------+------+------+------+------+------|
  * | LCTR |  ;:  |   Q  |   J  |   K  |   X  | '------'  '------' |   B  |   M  |   W  |   V  |   Z  | Enter|
  * `-----------------------------------------'  ________  _______ '-----------------------------------------'
  *               | LGui | LAlt | INTL |/LOWER| /       /  \      \RAISE \| RCTR |LOWER |  \|  |
@@ -184,7 +190,7 @@ LT(_NUMPAD,KC_ESC),KC_1,KC_2,KC_3,    KC_4,    KC_5,             LT(_SWITCH,KC_6
   //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
   KC_LSFT,  KC_A,   KC_O,    KC_E,    KC_U,    KC_I,                        KC_D,    KC_H,   KC_T,    KC_N,    KC_S,   KC_SLSH,
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
-  KC_LCTRL, KC_SCLN,KC_Q,    KC_J,    KC_K,    KC_X,  KC_MUTE,    KC_MPLY,  KC_B,    KC_M,   KC_W,    KC_V,    KC_Z,   KC_ENT,
+  KC_LCTRL, KC_SCLN,KC_Q,    KC_J,    KC_K,    KC_X,  KC_MPLY,    XXXXXXX,  KC_B,    KC_M,   KC_W,    KC_V,    KC_Z,   KC_ENT,
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
                  KC_LGUI, KC_LALT, KC_INTL, KC_LOWER, KC_ENT,     KC_SPC, KC_RAISE, KC_RCTRL, KC_LOWER, KC_BSLS
   //            \--------+--------+--------+---------+-------|   |--------+---------+--------+---------+-------/
@@ -389,7 +395,6 @@ const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
 );
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-
     unsigned l = 0;    
             
 	rgblight_set_layer_state(l++, layer_state_cmp(state, _DEFAULTS) && layer_state_cmp(default_layer_state,_QWERTY));
@@ -400,6 +405,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 	rgblight_set_layer_state(l++, layer_state_cmp(state, _ADJUST));
 	rgblight_set_layer_state(l++, layer_state_cmp(state, _NUMPAD));
 	rgblight_set_layer_state(l++, layer_state_cmp(state, _SWITCH));
+    
     return state;
 }
 void keyboard_post_init_user(void) {
@@ -416,9 +422,6 @@ void keyboard_post_init_user(void) {
 static void print_status_narrow(void) {
     // Print current mode
     oled_write_P(PSTR("\n\n"), false);
-
-	//snprintf(layer_state_str, sizeof(layer_state_str), "Layer: Undef-%ld", layer_state)
-
 
     switch (get_highest_layer(default_layer_state)) {
         case _QWERTY:
@@ -483,18 +486,64 @@ bool oled_task_user(void) {
 
 #endif
 
+/// MOUSE STUFF
+
+void pointing_device_init(void) {
+    i2c_init();
+    pimoroni_trackball_set_rgbw(TRACKBALL_DEFAULT_COLOR);
+    pimoroni_trackball_set_cpi(DEFAULT_CPI);
+}
+
+/**
+void smooth_mouse_movement(report_mouse_t* mouse_report) {
+    static report_mouse_t last_mouse_report   = {0};
+    if (has_mouse_report_changed(&last_mouse_report, mouse_report)) {
+        memcpy(&last_mouse_report, mouse_report, sizeof(report_mouse_t));
+    }
+    
+    // Linear interpolation and ease-in-out
+    static const fract8 fract = 0.5;
+
+    mouse_report->x = ease8InOutApprox(lerp8by8(last_mouse_report.x, mouse_report->x, fract));
+    mouse_report->y = ease8InOutApprox(lerp8by8(last_mouse_report.y, mouse_report->y, fract));
+    mouse_report->h = ease8InOutApprox(lerp8by8(last_mouse_report.h, mouse_report->h, fract));
+    mouse_report->v = ease8InOutApprox(lerp8by8(last_mouse_report.v, mouse_report->v, fract));
+}
+**/
+
+report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+
+    if (mouse_is_scrolling) {
+        mouse_report.h = mouse_report.x;
+        mouse_report.v = mouse_report.y;
+        mouse_report.x = 0;
+        mouse_report.y = 0;
+    }
+    
+    if(is_intl_layer) {
+        mouse_report.buttons = (mouse_report.buttons & 1) << 1;
+    }
+    
+    //smooth_mouse_movement(&mouse_report);
+    
+    return mouse_report;
+}
+
+//
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    bool process_keycode = false;
     switch (keycode) {
         case KC_QWERTY:
             if (record->event.pressed) {
                 set_single_persistent_default_layer(_QWERTY);
             }
-            return false;
+            break;
         case KC_DVORAK:
             if (record->event.pressed) {
                 set_single_persistent_default_layer(_DVORAK);
             }
-            return false;
+            break;
         case KC_LOWER:
             if (record->event.pressed) {
                 layer_on(_LOWER);
@@ -503,7 +552,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_LOWER);
                 update_tri_layer(_LOWER, _RAISE, _ADJUST);
             }
-            return false;
+            break;
         case KC_RAISE:
             if (record->event.pressed) {
                 layer_on(_RAISE);
@@ -512,122 +561,97 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 layer_off(_RAISE);
                 update_tri_layer(_LOWER, _RAISE, _ADJUST);
             }
-            return false;
+            break;
         case KC_ADJUST:
             if (record->event.pressed) {
                 layer_on(_ADJUST);
             } else {
                 layer_off(_ADJUST);
             }
-            return false;
+            break;
         case KC_INTL:
             is_intl_layer = record->event.pressed;
-            return false;
+            break;
 
         default:
+            process_keycode = true;
             if(is_intl_layer && record->event.pressed) {    // Would be nicer with lambda that determines press/unpress
+                process_keycode = false;
                 switch (keycode) {
                     case KC_A:
                         tap_code16(RALT(KC_Q)); // for ä at position a
-                        return false;
+                        break;
                     case KC_S:
                         tap_code16(RALT(KC_S)); // for ß at position s
-                        return false;
+                        break;
                     case KC_U:
                         tap_code16(RALT(KC_Y)); // for ü at position u
-                        return false;
+                        break;
                     case KC_O:
                         tap_code16(RALT(KC_P)); // for ö at position o
-                        return false;
+                        break;
                     case KC_E:
                         tap_code16(RALT(KC_5)); // for € at position e
-                        return false;
+                        break;
                     default:
-                        return true; // Don't modify
+                        process_keycode = true;
+                        break; // Don't modify
                 }
             }
     }
-    return true;
+    
+    bool is_scrolling_layer = false;
+    switch (get_highest_layer(layer_state)) {
+        case _LOWER:
+            is_scrolling_layer = true;
+            break;
+        default:
+            break;
+    }
+    
+    if(mouse_is_scrolling != is_scrolling_layer) {
+        if(mouse_is_scrolling) {
+            pimoroni_trackball_set_rgbw(TRACKBALL_SCROLLING_COLOR);
+            pimoroni_trackball_set_cpi(SCROLLING_CPI);
+        } else {
+            if(is_intl_layer) {
+                pimoroni_trackball_set_rgbw(TRACKBALL_RIGHTCLICK_COLOR);
+            } else {
+                pimoroni_trackball_set_rgbw(TRACKBALL_DEFAULT_COLOR);
+            }    
+            pimoroni_trackball_set_cpi(DEFAULT_CPI);
+        }
+    }    
+    
+    return process_keycode;
 }
 
 #ifdef ENCODER_ENABLE
 
 bool encoder_update_user(uint8_t index, bool clockwise) {
     if (index == 0) {
-        if (clockwise) {
-            tap_code(KC_VOLU);
-        } else {
-            tap_code(KC_VOLD);
-        }
-	} else if (index == 1) {
-    	// DEAD code as we don't have a right side encoder anymore
 		switch (get_highest_layer(layer_state)) {
-			case _QWERTY:
-			case _DVORAK:
+		case _QWERTY:
+		case _DVORAK:
+            if (clockwise) {
+                tap_code(KC_VOLU);
+            } else {
+                tap_code(KC_VOLD);
+            }
+        break;
+		case _LOWER:
 				if (clockwise) {
 					tap_code(KC_MNXT);
 				} else {
 					tap_code(KC_MPRV);
 				}
 			break;
-		case _RAISE:
-		case _LOWER:
-				if (clockwise) {
-					tap_code(KC_DOWN);
-				} else {
-					tap_code(KC_UP);
-				}
-			break;
 		default:
-				if (clockwise) {
-					tap_code(KC_WH_D);
-				} else {
-					tap_code(KC_WH_U);
-				}
-			break;
-	    }
-    }
+		    break;
+        }
+	}
     return true;
 }
 
 #endif
 
-
-static uint32_t       last_mouse_activity = 0;
-static report_mouse_t last_mouse_report   = {0};
-static bool           is_scrolling        = false;
-
-report_mouse_t smooth_mouse_movement(report_mouse_t mouse_report) {
-    // Linear interpolation and ease-in-out
-    static fract8 fract = 0.5;
-    int8_t        x     = 0;
-    int8_t        y     = 0;
-    int8_t        h     = 0;
-    int8_t        v     = 0;
-
-    if (!is_scrolling) {
-        x = ease8InOutApprox(lerp8by8(last_mouse_report.x, mouse_report.x, fract));
-        y = ease8InOutApprox(lerp8by8(last_mouse_report.y, mouse_report.y, fract));
-    } else {
-        h = ease8InOutApprox(lerp8by8(last_mouse_report.x, mouse_report.x, fract));
-        v = ease8InOutApprox(lerp8by8(last_mouse_report.y, mouse_report.y, fract));
-    }
-
-    // update the new smoothed report
-    mouse_report.x = x;
-    mouse_report.y = y;
-    mouse_report.h = h;
-    mouse_report.v = v;
-
-    return mouse_report;
-}
-
-report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-
-    if (has_mouse_report_changed(&last_mouse_report, &mouse_report)) {
-        last_mouse_activity = timer_read32();
-        memcpy(&last_mouse_report, &mouse_report, sizeof(mouse_report));
-    }
-
-    return smooth_mouse_movement(mouse_report);
-}
