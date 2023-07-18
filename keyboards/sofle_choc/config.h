@@ -29,6 +29,7 @@
 
 #ifdef RGB_MATRIX_ENABLE
 #define WS2812_DI_PIN D3
+#define RGB_DI_PIN D3
 #define RGBLED_NUM 29
 #define RGB_MATRIX_LED_COUNT 58
 #define RGB_MATRIX_SPLIT { 29, 29 }
