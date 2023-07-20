@@ -15,7 +15,6 @@
  */
 #pragma once
 
-// Plug USB into the left half of the keyboard
 // see https://docs.qmk.fm/#/feature_split_keyboard?id=setting-handedness
 #define EE_HANDS
 
@@ -37,8 +36,10 @@
 #ifdef RGB_MATRIX_ENABLE
     #define RGB_DISABLE_WHEN_USB_SUSPENDED     // turn off effects when suspended
     #define SPLIT_TRANSPORT_MIRROR             // If LED_MATRIX_KEYPRESSES or LED_MATRIX_KEYRELEASES is enabled, you also will want to enable SPLIT_TRANSPORT_MIRROR
-    #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 150  // limits maximum brightness of LEDs (max 255). Higher may cause the controller to crash.
-    #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_JELLYBEAN_RAINDROPS
+    #define SPLIT_LAYER_STATE_ENABLE           //allows layer leds to be addressed on the second side
+    #define SPLIT_MODS_ENABLE                  //allows mods to address leds on the second side.
+    #define RGB_MATRIX_MAXIMUM_BRIGHTNESS 200  // limits maximum brightness of LEDs (max 255). Higher may cause the controller to crash.
+    #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_RAINBOW_MOVING_CHEVRON
 
     // Animations
     // Uncomment any that you want to try. Limited by
@@ -68,12 +69,12 @@
     // #define ENABLE_RGB_MATRIX_RAINBOW_BEACON
     // #define ENABLE_RGB_MATRIX_RAINBOW_PINWHEELS
     // #define ENABLE_RGB_MATRIX_RAINDROPS
-    #define ENABLE_RGB_MATRIX_JELLYBEAN_RAINDROPS
+    // #define ENABLE_RGB_MATRIX_JELLYBEAN_RAINDROPS
     // #define ENABLE_RGB_MATRIX_HUE_BREATHING
     // #define ENABLE_RGB_MATRIX_HUE_PENDULUM
     // #define ENABLE_RGB_MATRIX_HUE_WAVE
     // #define ENABLE_RGB_MATRIX_PIXEL_FRACTAL
-    // #define ENABLE_RGB_MATRIX_PIXEL_FLOW
+    // #define ENABLE_RGB_MATRIX_PIXEL_FLOW	
     // #define ENABLE_RGB_MATRIX_PIXEL_RAIN
 
     // These modes require the RGB_MATRIX_FRAMEBUFFER_EFFECTS define
@@ -83,17 +84,20 @@
 
     // These modes require the RGB_MATRIX_KEYPRESSES or RGB_MATRIX_KEYRELEASES define
     #define RGB_MATRIX_KEYPRESSES
-    // #define RGB_MATRIX_KEYRELEASES
-    // #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
-    // #define ENABLE_RGB_MATRIX_SOLID_REACTIVE
+    //#define RGB_MATRIX_KEYRELEASES
+    #define RGB_MATRIX_KEYRELEASES_WITH_LAYERCOLOR
+    #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_SIMPLE
+    #define ENABLE_RGB_MATRIX_SOLID_REACTIVE
+    // To enable gradient mode that will automatically change reactive color, add the following define:
+    #define RGB_MATRIX_SOLID_REACTIVE_GRADIENT_MODE
     // #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_WIDE
-    #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTIWIDE
+    // #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTIWIDE
     // #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_CROSS
     // #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTICROSS
     // #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_NEXUS
-    #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTINEXUS
+    // #define ENABLE_RGB_MATRIX_SOLID_REACTIVE_MULTINEXUS
     // #define ENABLE_RGB_MATRIX_SPLASH
-    #define ENABLE_RGB_MATRIX_MULTISPLASH
+    // #define ENABLE_RGB_MATRIX_MULTISPLASH
     // #define ENABLE_RGB_MATRIX_SOLID_SPLASH
     // #define ENABLE_RGB_MATRIX_SOLID_MULTISPLASH
 

@@ -202,13 +202,13 @@ LT(_NUMPAD,KC_ESC),KC_1,KC_2,KC_3,    KC_4,    KC_5,                        KC_6
  */
 [_NUMPAD] = LAYOUT(
   //,------------------------------------------------.                    ,---------------------------------------------------.
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   KC_NUM,  XXXXXXX,XXXXXXX, XXXXXXX, XXXXXXX, _______,
+  _______, _______, _______, _______, _______, _______,                   KC_NUM,  XXXXXXX,XXXXXXX, XXXXXXX, XXXXXXX, _______,
   //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   KC_CIRC, KC_P7,  KC_P8,   KC_P9,   KC_ASTR, _______,
+  _______, _______, _______, _______, _______, _______,                   KC_CIRC, KC_P7,  KC_P8,   KC_P9,   KC_ASTR, _______,
   //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                   KC_MINS, KC_P4,  KC_P5,   KC_P6,   KC_SLSH, KC_PIPE,
+  _______, _______, _______, _______, _______, _______,                   KC_MINS, KC_P4,  KC_P5,   KC_P6,   KC_SLSH, KC_PIPE,
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
-  _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,_______,   _______,KC_PLUS, KC_P1,  KC_P2,   KC_P3,   KC_EQL,  TG(_NUMPAD),
+  _______, _______, _______, _______, _______, _______,_______,   _______,KC_PLUS, KC_P1,  KC_P2,   KC_P3,   KC_EQL,  TG(_NUMPAD),
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
               _______, OSM(MOD_MEH), _______, _______, _______,   _______, _______,  KC_P0,   KC_PDOT,   KC_ENT
   //            \--------+--------+--------+---------+-------|   |--------+---------+--------+---------+-------/
@@ -295,6 +295,72 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
     [_ADJUST] = { ENCODER_CCW_CW(RGB_RMOD, RGB_MOD),  ENCODER_CCW_CW(KC_RIGHT, KC_LEFT) },
     [_NUMPAD] = { ENCODER_CCW_CW(RGB_RMOD, RGB_MOD),  ENCODER_CCW_CW(KC_RIGHT, KC_LEFT) },
 };
+#endif
+
+#ifdef RGB_MATRIX_ENABLE
+#define HSV_RORANGE  10,255,255
+#define RGB_RORANGE  0xFF,0x20,00
+#define QUERTY_COLOR RGB_SPRINGGREEN
+#define DVORAK_COLOR RGB_RORANGE
+#define LOWER_COLOR RGB_TEAL
+#define RAISE_COLOR RGB_YELLOW
+#define ADJUST_COLOR RGB_PURPLE
+#define NUMPAD_COLOR RGB_BLUE
+
+
+#define SPLIT_LED_OFFSET 29
+#define NUMPAD_SWITCH_LED (25 + SPLIT_LED_OFFSET)
+
+const uint8_t numpad_leds[] = {
+         7, 8, 9,
+        12,13,14,
+        17,18,19,
+};
+
+const uint8_t modifier_leds[] = {
+        4,5,6,15,16
+};
+const uint8_t split_led_offset = 29;
+
+bool rgb_matrix_indicators_user(void) {
+    switch (get_highest_layer(layer_state)) {
+        case _QWERTY:
+        case _DVORAK:
+            break;
+        case _LOWER:
+            for (uint8_t i = 0; i < sizeof(modifier_leds); i++)
+            {
+                rgb_matrix_set_color(modifier_leds[i], LOWER_COLOR);
+                rgb_matrix_set_color(modifier_leds[i] + SPLIT_LED_OFFSET, LOWER_COLOR);
+            }
+            break;
+        case _RAISE:
+            for (uint8_t i = 0; i < sizeof(modifier_leds); i++)
+            {
+                rgb_matrix_set_color(modifier_leds[i], RAISE_COLOR);
+                rgb_matrix_set_color(modifier_leds[i] + SPLIT_LED_OFFSET, RAISE_COLOR);
+            }
+            rgb_matrix_set_color(NUMPAD_SWITCH_LED, NUMPAD_COLOR);
+            break;
+        case _ADJUST:
+            for (uint8_t i = 0; i < sizeof(modifier_leds); i++)
+            {
+                rgb_matrix_set_color(modifier_leds[i], ADJUST_COLOR);
+                rgb_matrix_set_color(modifier_leds[i] + SPLIT_LED_OFFSET, ADJUST_COLOR);
+            }
+            break;
+        case _NUMPAD:
+            for (uint8_t i = 0; i < sizeof(numpad_leds); i++)
+            {
+                rgb_matrix_set_color(numpad_leds[i] + SPLIT_LED_OFFSET, NUMPAD_COLOR);       
+            }
+            rgb_matrix_set_color(NUMPAD_SWITCH_LED, NUMPAD_COLOR);
+            break;
+        default:
+            break;
+    }
+    return true;
+}
 #endif
 
 #ifdef OLED_ENABLE
