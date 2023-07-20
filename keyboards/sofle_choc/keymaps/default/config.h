@@ -17,7 +17,7 @@
 
 // Plug USB into the left half of the keyboard
 // see https://docs.qmk.fm/#/feature_split_keyboard?id=setting-handedness
-#define MASTER_RIGHT
+//#define MASTER_LEFT
 
 // Enabling this option changes the startup behavior to listen for an
 // active USB communication to delegate which part is master and which

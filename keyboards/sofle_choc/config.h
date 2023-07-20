@@ -27,6 +27,7 @@
 #define ENCODERS_PAD_A_RIGHT { F4 }
 #define ENCODERS_PAD_B_RIGHT { F5 }
 
+
 #ifdef RGB_MATRIX_ENABLE
 #define WS2812_DI_PIN D3
 #define RGB_DI_PIN D3
