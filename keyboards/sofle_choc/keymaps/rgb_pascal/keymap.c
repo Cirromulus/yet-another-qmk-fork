@@ -290,18 +290,19 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
     [_QWERTY] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU),   ENCODER_CCW_CW(KC_MPRV, KC_MNXT)  },
     [_DVORAK] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU),   ENCODER_CCW_CW(KC_MPRV, KC_MNXT)  },
-    [_LOWER]  = { ENCODER_CCW_CW(RGB_HUD, RGB_HUI),   ENCODER_CCW_CW(RGB_SAD, RGB_SAI)  },
+    [_LOWER]  = { ENCODER_CCW_CW(KC_MPRV, KC_MNXT),   ENCODER_CCW_CW(KC_VOLD, KC_VOLU)  },
     [_RAISE]  = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI),   ENCODER_CCW_CW(RGB_SPD, RGB_SPI)  },
-    [_ADJUST] = { ENCODER_CCW_CW(RGB_RMOD, RGB_MOD),  ENCODER_CCW_CW(KC_RIGHT, KC_LEFT) },
+    [_ADJUST] = { ENCODER_CCW_CW(RGB_HUD, RGB_HUI),   ENCODER_CCW_CW(RGB_SAD, RGB_SAI)  },
     [_NUMPAD] = { ENCODER_CCW_CW(RGB_RMOD, RGB_MOD),  ENCODER_CCW_CW(KC_RIGHT, KC_LEFT) },
 };
 #endif
 
 #ifdef RGB_MATRIX_ENABLE
 #define HSV_RORANGE  10,255,255
-#define RGB_RORANGE  0xFF,0x20,00
+#define RGB_RORANGE  0xFF,0x15,00
 #define QUERTY_COLOR RGB_SPRINGGREEN
 #define DVORAK_COLOR RGB_RORANGE
+#define ARROW_COLOR RGB_RORANGE
 #define LOWER_COLOR RGB_TEAL
 #define RAISE_COLOR RGB_YELLOW
 #define ADJUST_COLOR RGB_PURPLE
@@ -315,6 +316,13 @@ const uint8_t numpad_leds[] = {
          7, 8, 9,
         12,13,14,
         17,18,19,
+        6           // "zero"
+};
+
+const uint8_t arrow_leds[] = {
+        8,
+        12,13,
+        18
 };
 
 const uint8_t modifier_leds[] = {
@@ -332,6 +340,10 @@ bool rgb_matrix_indicators_user(void) {
             {
                 rgb_matrix_set_color(modifier_leds[i], LOWER_COLOR);
                 rgb_matrix_set_color(modifier_leds[i] + SPLIT_LED_OFFSET, LOWER_COLOR);
+            }
+            for (uint8_t i = 0; i < sizeof(arrow_leds); i++)
+            {
+                rgb_matrix_set_color(arrow_leds[i] + SPLIT_LED_OFFSET, ARROW_COLOR);
             }
             break;
         case _RAISE:
