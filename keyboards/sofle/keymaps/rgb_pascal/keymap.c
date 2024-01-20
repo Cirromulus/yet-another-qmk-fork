@@ -114,7 +114,7 @@ enum custom_keycodes {
 
 static bool is_intl_layer = false;
 static bool mouse_is_scrolling  = false;
-#define DEFAULT_CPI 13000
+#define DEFAULT_CPI 8000
 #define SCROLLING_CPI 1500
 
 #define KC_REDO LCTL(LSFT(KC_Z))
@@ -227,7 +227,7 @@ LT(_NUMPAD,KC_ESC),KC_1,KC_2,KC_3,    KC_4,    KC_5,             LT(_SWITCH,KC_6
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * | ____ | LAt  | LCtl |LShift|      | Caps | .------.  ,------. |   -  |   +  |   {  |   }  |   |  |   `  |
  * |------+------+------+------+------+------| | ____ |  | ____ | |------+------+------+------+------+------|
- * | ____ | Undo |  Cut | Copy | Paste|      | '------'  '------' |   _  |   =  |   [  |   ]  |   ~  | TOGG NUMP| 
+ * | ____ | Undo |  Cut | Copy | Paste|      | '------'  '------' |   _  |   =  |   [  |   ]  |   ~  | TOGG NUMP|
  * `-----------------------------------------'  ________  _______ '-----------------------------------------'
  *               | ____ | ____ | ____ |/ ____| /       /  \      \ ____ \| ____ | ____ | ____ |
  *               |      |      |      |      |/ Space /    \Enter \      \      |      |      |
@@ -241,7 +241,7 @@ LT(_NUMPAD,KC_ESC),KC_1,KC_2,KC_3,    KC_4,    KC_5,             LT(_SWITCH,KC_6
   //|------+-------+--------+--------+--------+------|                   |--------+-------+--------+--------+--------+---------|
   _______, KC_LALT,  KC_LCTL, KC_LSFT,XXXXXXX, KC_CAPS,                   KC_MINS, KC_PLUS,KC_LCBR, KC_RCBR, KC_PIPE, KC_GRV,
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
-  _______, KC_UNDO,  KC_CUT,  KC_COPY,KC_PASTE, XXXXXXX,_______,  _______,KC_UNDS, KC_EQL, KC_LBRC, KC_RBRC, KC_TILD, TG(_NUMPAD), 
+  _______, KC_UNDO,  KC_CUT,  KC_COPY,KC_PASTE, XXXXXXX,_______,  _______,KC_UNDS, KC_EQL, KC_LBRC, KC_RBRC, KC_TILD, TG(_NUMPAD),
   //|------+-------+--------+--------+--------+------|  ===  |   |  ===  |--------+-------+--------+--------+--------+---------|
                  _______, _______, _______, _______, KC_SPC,     KC_ENT , _______, _______, _______, _______
   //            \--------+--------+--------+---------+-------|   |--------+---------+--------+---------+-------/
@@ -391,8 +391,8 @@ const rgblight_segment_t* const PROGMEM my_rgb_layers[] = RGBLIGHT_LAYERS_LIST(
 );
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-    unsigned l = 0;    
-            
+    unsigned l = 0;
+
 	rgblight_set_layer_state(l++, layer_state_cmp(state, _DEFAULTS) && layer_state_cmp(default_layer_state,_QWERTY));
 	rgblight_set_layer_state(l++, layer_state_cmp(state, _DEFAULTS) && layer_state_cmp(default_layer_state,_DVORAK));
 
@@ -401,7 +401,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 	rgblight_set_layer_state(l++, layer_state_cmp(state, _ADJUST));
 	rgblight_set_layer_state(l++, layer_state_cmp(state, _NUMPAD));
 	rgblight_set_layer_state(l++, layer_state_cmp(state, _SWITCH));
-    
+
     return state;
 }
 void keyboard_post_init_user(void) {
@@ -455,13 +455,13 @@ static void print_status_narrow(void) {
         default:
             oled_write_ln_P(PSTR("Undef"), false);
     }
-    
+
     if(is_intl_layer) {
         oled_write_ln_P(PSTR("Intl"), false);
     } else {
         oled_write_ln_P(PSTR(" "), false);
     }
-    
+
 }
 
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
@@ -496,7 +496,7 @@ void smooth_mouse_movement(report_mouse_t* mouse_report) {
     if (has_mouse_report_changed(&last_mouse_report, mouse_report)) {
         memcpy(&last_mouse_report, mouse_report, sizeof(report_mouse_t));
     }
-    
+
     // Linear interpolation and ease-in-out
     static const fract8 fract = 0.5;
 
@@ -532,7 +532,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         default:
             break;
     }
-    
+
     if(mouse_is_scrolling != is_scrolling_layer) {
         mouse_is_scrolling = is_scrolling_layer;
         if(mouse_is_scrolling) {
@@ -543,7 +543,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
                 trackball_set_rgbw(TRACKBALL_RIGHTCLICK_COLOR);
             } else {
                 trackball_set_rgbw(TRACKBALL_DEFAULT_COLOR);
-            }    
+            }
             pointing_device_set_cpi(DEFAULT_CPI);
         }
     }
@@ -554,13 +554,13 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         mouse_report.x = 0;
         mouse_report.y = 0;
     }
-    
+
     if(is_intl_layer) {
-        mouse_report.buttons = (mouse_report.buttons & 1) << 1;
+        mouse_report.buttons = (mouse_report.buttons & 1) << 1; // right-click
     }
-    
+
     //smooth_mouse_movement(&mouse_report);
-    
+
     return mouse_report;
 }
 
